@@ -13,7 +13,7 @@ exports.getTopics = (req, res, next) => {
 
 exports.getEndpoints = (req, res, next) => {
   const endpoints = require("../endpoints.json");
-  res.send(200).send(endpoints);
+  res.status(200).send(endpoints);
 };
 
 exports.getArticleById = (req, res, next) => {
@@ -21,7 +21,6 @@ exports.getArticleById = (req, res, next) => {
 
   findArticlesById(article_id)
     .then((article) => {
-
       res.status(200).send({ article });
     })
     .catch((err) => {

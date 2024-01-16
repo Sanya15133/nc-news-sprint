@@ -15,4 +15,3 @@ exports.findArticlesById = (id) => {
       return article;
     });
 };
-

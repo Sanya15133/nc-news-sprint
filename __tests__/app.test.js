@@ -3,7 +3,6 @@ const request = require("supertest");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
-const { getEndpoints } = require("../controllers/news.controllers.js");
 
 beforeEach(() => {
   return seed(data);
@@ -53,12 +52,11 @@ describe("/api", () => {
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        for (const key of Object.entries(body)) {
-          console.log(body);
-          expect(typeof body).toBe("object");
-          expect(key).toHaveProperty("GET /api");
-          expect(key).toHaveProperty("GET /api/topics");
-        }
+        expect(typeof body).toBe("object");
+        expect(body).toHaveProperty("GET /api");
+        expect(body).toHaveProperty("GET /api/topics");
+        expect(body).toHaveProperty("GET /api/articles");
+        expect(body).toHaveProperty("GET /api/articles/:article_id");
       });
   });
 });
