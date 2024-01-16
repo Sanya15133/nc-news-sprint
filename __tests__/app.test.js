@@ -61,12 +61,14 @@ describe("/api", () => {
   });
 });
 
-describe("GET /api/articles/:article_id", () => {
+describe.only("GET /api/articles/:article_id", () => {
   it("returns article that matches id", () => {
     return request(app)
       .get("/api/articles/6")
+      .expect(200)
       .then(({ body }) => {
         expect(body.article).toMatchObject({
+          article_id: 6,
           title: "A",
           topic: "mitch",
           author: "icellusedkars",
@@ -74,6 +76,45 @@ describe("GET /api/articles/:article_id", () => {
           created_at: "2020-10-18T01:00:00.000Z",
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  it("returns 404 msg for valid id but non-existent article", () => {
+    return request(app)
+      .get("/api/articles/67985986")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Not found");
+      });
+  });
+  it("returns 400 msg for invalid id", () => {
+    return request(app)
+      .get("/api/articles/not-an-id")
+      .expect(400)
+      .then((res) => {
+        console.log(res.body.msg, "<body");
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("returns array of articles with correct properties", () => {
+  it("returns correct keys in articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((response) => {
+        const {
+          body: { articles },
+        } = response;
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
         });
       });
   });
