@@ -6,3 +6,12 @@ exports.selectTopics = () => {
     return res.rows;
   });
 };
+
+exports.findArticlesById = (id) => {
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
+    .then(({ rows }) => {
+      const article = rows[0];
+      return article;
+    });
+};
