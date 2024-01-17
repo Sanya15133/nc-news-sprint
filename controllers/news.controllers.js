@@ -2,6 +2,7 @@ const {
   selectTopics,
   findArticlesById,
   findArticles,
+  findCommentsByArticleId,
 } = require("../models/news.models");
 const fs = require("fs/promises");
 
@@ -32,8 +33,18 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-
   findArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  findCommentsByArticleId(article_id)
     .then((articles) => {
       res.status(200).send({ articles });
     })
