@@ -1,4 +1,8 @@
-const { selectTopics, findArticlesById } = require("../models/news.models");
+const {
+  selectTopics,
+  findArticlesById,
+  findArticles,
+} = require("../models/news.models");
 const fs = require("fs/promises");
 
 exports.getTopics = (req, res, next) => {
@@ -22,6 +26,17 @@ exports.getArticleById = (req, res, next) => {
   findArticlesById(article_id)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getArticles = (req, res, next) => {
+
+  findArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);
