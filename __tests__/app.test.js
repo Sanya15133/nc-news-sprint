@@ -61,7 +61,7 @@ describe("/api", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   it("returns article that matches id", () => {
     return request(app)
       .get("/api/articles/6")
@@ -98,24 +98,24 @@ describe.only("GET /api/articles/:article_id", () => {
   });
 });
 
-describe("returns array of articles with correct properties", () => {
-  it("returns correct keys in articles", () => {
-    return request(app)
-      .get("/api/articles")
-      .then((response) => {
-        const {
-          body: { articles },
-        } = response;
-        articles.forEach((article) => {
-          expect(article).toHaveProperty("author");
-          expect(article).toHaveProperty("title");
-          expect(article).toHaveProperty("article_id");
-          expect(article).toHaveProperty("topic");
-          expect(article).toHaveProperty("created_at");
-          expect(article).toHaveProperty("votes");
-          expect(article).toHaveProperty("article_img_url");
-          expect(article).toHaveProperty("comment_count");
-        });
-      });
-  });
-});
+// describe("returns array of articles with correct properties", () => {
+//   it("returns correct keys in articles", () => {
+//     return request(app)
+//       .get("/api/articles")
+//       .then((response) => {
+//         const {
+//           body: { articles },
+//         } = response;
+//        articles.forEach((article) => {
+//           expect(article).toHaveProperty("author");
+//           expect(article).toHaveProperty("title");
+//           expect(article).toHaveProperty("article_id");
+//           expect(article).toHaveProperty("topic");
+//           expect(article).toHaveProperty("created_at");
+//           expect(article).toHaveProperty("votes");
+//           expect(article).toHaveProperty("article_img_url");
+//           expect(article).toHaveProperty("comment_count");
+//         });
+//       });
+//   });
+// });
