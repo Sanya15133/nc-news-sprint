@@ -93,33 +93,88 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/not-an-id")
       .expect(400)
       .then((res) => {
-        console.log(res.body.msg, "<body");
         expect(res.body.msg).toBe("Invalid input");
       });
   });
 });
 
-  describe("GET /api/articles", () => {
-    it("return array of articles with following properties", () => {
+describe("GET /api/articles", () => {
+  it("return array of articles with following properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const {
+          body: { articles },
+        } = response;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles).toBeSorted({ descending: true });
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+        });
+      });
+  });
+  describe("GET /api/articles/:article_id/comments", () => {
+    it("returns article that matches id", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles/1/comments")
         .expect(200)
         .then((response) => {
           const {
             body: { articles },
           } = response;
-          expect(Array.isArray(articles)).toBe(true);
-          expect(articles).toBeSorted({ descending: true });
           articles.forEach((article) => {
-            expect(article).toHaveProperty("author");
-            expect(article).toHaveProperty("title");
-            expect(article).toHaveProperty("article_id");
-            expect(article).toHaveProperty("topic");
-            expect(article).toHaveProperty("created_at");
+            expect(Array.isArray(articles)).toBe(true);
+            expect(article).toHaveProperty("comment_id");
             expect(article).toHaveProperty("votes");
-            expect(article).toHaveProperty("article_img_url");
-            expect(article).toHaveProperty("comment_count");
+            expect(article).toHaveProperty("created_at");
+            expect(article).toHaveProperty("author");
+            expect(article).toHaveProperty("body");
+            expect(article).toHaveProperty("article_id");
+          });
+        });
+    });
+    it("check property types of values", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((response) => {
+          const {
+            body: { articles },
+          } = response;
+          articles.forEach((article) => {
+            expect(typeof article["comment_id"]).toBe("number");
+            expect(typeof article.votes).toBe("number");
+            expect(typeof article["created_at"]).toBe("string");
+            expect(typeof article.author).toBe("string");
+            expect(typeof article.body).toBe("string");
+            expect(typeof article["article_id"]).toBe("number");
           });
         });
     });
 
+    it("returns 404 msg for valid id but non-existent article", () => {
+      return request(app)
+        .get("/api/articles/67985986/comments")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("Article not found");
+        });
+    });
+    it("returns 400 msg for invalid id", () => {
+      return request(app)
+        .get("/api/articles/not-an-id/comments")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Invalid input");
+        });
+    });
+  });
+});
