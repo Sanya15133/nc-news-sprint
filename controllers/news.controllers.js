@@ -58,7 +58,6 @@ exports.postCommentByArticleId = (req, res, next) => {
   const { username, body } = req.body;
   const { article_id } = req.params;
 
-  console.log(req.body, "controllers");
 
   findCommentToAdd(article_id, username, body)
     .then((comment) => {

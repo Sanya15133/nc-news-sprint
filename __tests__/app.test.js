@@ -201,7 +201,6 @@ describe("GET /api/articles", () => {
         .send({ username: "butter_bridge", body: "this is a comment" })
         .expect(404) // here // here
         .then((response) => {
-          console.log(response.body, "<<<<test msg");
           expect(response.body.msg).toBe("Not found");
         });
     });
