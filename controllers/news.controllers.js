@@ -3,6 +3,7 @@ const {
   findArticlesById,
   findArticles,
   findCommentsByArticleId,
+  findCommentToAdd,
 } = require("../models/news.models");
 const fs = require("fs/promises");
 
@@ -47,6 +48,21 @@ exports.getCommentsByArticleId = (req, res, next) => {
   findCommentsByArticleId(article_id)
     .then((articles) => {
       res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postCommentByArticleId = (req, res, next) => {
+  const { username, body } = req.body;
+  const { article_id } = req.params;
+
+  console.log(req.body, "controllers");
+
+  findCommentToAdd(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);

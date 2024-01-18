@@ -93,7 +93,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/not-an-id")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid input");
+        expect(res.body.msg).toBe("Invalid request");
       });
   });
 });
@@ -164,16 +164,72 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles/67985986/comments")
         .expect(404)
-        .then((res) => {
-          expect(res.body.msg).toBe("Article not found");
+        .then((response) => {
+          expect(response.body.msg).toBe("Article not found");
         });
     });
     it("returns 400 msg for invalid id", () => {
       return request(app)
         .get("/api/articles/not-an-id/comments")
         .expect(400)
-        .then((res) => {
-          expect(res.body.msg).toBe("Invalid input");
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid request");
+        });
+    });
+  });
+
+  describe("POST /api/articles/:article_id/comments", () => {
+    it("check property types of posted values", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge", body: "this is a comment" })
+        .expect(201)
+        .then((response) => {
+          const {
+            body: { comment },
+          } = response;
+          expect(comment).toMatchObject({
+            author: "butter_bridge",
+            body: "this is a comment",
+          });
+        });
+    });
+
+    it("POST / returns 404 msg for valid id but non-existent article", () => {
+      return request(app)
+        .post("/api/articles/67985986/comments")
+        .send({ username: "butter_bridge", body: "this is a comment" })
+        .expect(404) // here // here
+        .then((response) => {
+          console.log(response.body, "<<<<test msg");
+          expect(response.body.msg).toBe("Not found");
+        });
+    });
+    it("POST / returns 400 msg for invalid id", () => {
+      return request(app)
+        .post("/api/articles/not-an-id/comments")
+        .send({ username: "butter_bridge", body: "this is a comment" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid request");
+        });
+    });
+    it("POST / returns 400 error if username is not given", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ body: "this is a comment" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    it("POST / returns 400 error if body is not given", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
         });
     });
   });
