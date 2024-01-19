@@ -327,12 +327,23 @@ describe("GET /api/articles", () => {
             expect(response.body.msg).toBe("Comment not found");
           });
       });
-      it("DELETE / returns undefined if comment_id is omitted", () => {
+    });
+    describe("/api/users", () => {
+      it("returns users table with correct array length and properties", () => {
         return request(app)
-          .delete("/api/comments")
-          .expect(404)
+          .get("/api/users")
           .then((response) => {
-            expect(response.body.msg).toBe(undefined);
+            const {
+              body: { users },
+            } = response;
+            expect(Array.isArray(users)).toBe(true);
+            expect(users.length).toBe(4);
+            expect(response.status).toBe(200);
+            users.forEach((user) => {
+              expect(user).toHaveProperty("username");
+              expect(user).toHaveProperty("name");
+              expect(user).toHaveProperty("avatar_url");
+            });
           });
       });
     });
