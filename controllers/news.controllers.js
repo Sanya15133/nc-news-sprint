@@ -5,6 +5,7 @@ const {
   findCommentsByArticleId,
   findCommentToAdd,
   setVotes,
+  findCommentByCommentId,
 } = require("../models/news.models");
 const fs = require("fs/promises");
 
@@ -75,6 +76,18 @@ exports.updateVotes = (req, res, next) => {
   setVotes(article_id, inc_votes)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteCommentByCommentId = (req, res, next) => {
+  const { comment_id } = req.params;
+
+  findCommentByCommentId(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);

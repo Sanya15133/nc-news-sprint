@@ -307,5 +307,34 @@ describe("GET /api/articles", () => {
           expect(response.body.msg).toBe("Bad request");
         });
     });
+    describe("DELETE /api/comments/:comment_id", () => {
+      it("DELETE / deletes comment by comment id", () => {
+        return request(app).delete("/api/comments/1").expect(204);
+      });
+      it("DELETE / returns 400 for invalid comment id", () => {
+        return request(app)
+          .delete("/api/comments/not-an-id")
+          .expect(400)
+          .then((response) => {
+            expect(response.body.msg).toBe("Invalid request");
+          });
+      });
+      it("DELETE / returns 404 not found for valid but non-existant comment id", () => {
+        return request(app)
+          .delete("/api/comments/875")
+          .expect(404)
+          .then((response) => {
+            expect(response.body.msg).toBe("Comment not found");
+          });
+      });
+      it("DELETE / returns undefined if comment_id is omitted", () => {
+        return request(app)
+          .delete("/api/comments")
+          .expect(404)
+          .then((response) => {
+            expect(response.body.msg).toBe(undefined);
+          });
+      });
+    });
   });
 });
