@@ -4,6 +4,7 @@ const {
   findArticles,
   findCommentsByArticleId,
   findCommentToAdd,
+  setVotes,
 } = require("../models/news.models");
 const fs = require("fs/promises");
 
@@ -58,10 +59,22 @@ exports.postCommentByArticleId = (req, res, next) => {
   const { username, body } = req.body;
   const { article_id } = req.params;
 
-
   findCommentToAdd(article_id, username, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.updateVotes = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { article_id } = req.params;
+
+  setVotes(article_id, inc_votes)
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);

@@ -194,7 +194,6 @@ describe("GET /api/articles", () => {
           });
         });
     });
-
     it("POST / returns 404 msg for valid id but non-existent article", () => {
       return request(app)
         .post("/api/articles/67985986/comments")
@@ -222,10 +221,87 @@ describe("GET /api/articles", () => {
           expect(response.body.msg).toBe("Bad request");
         });
     });
+    it("POST / returns 404 error if username does not exist", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "heyfjv", body: "this is a comment" })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("Not found");
+        });
+    });
     it("POST / returns 400 error if body is not given", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send({ username: "butter_bridge" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+  });
+
+  describe("PATCH /api/articles/:article_id", () => {
+    it(" PATCH /updates vote property by article_id", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 6 })
+        .expect(200)
+        .then((response) => {
+          const {
+            body: { article },
+          } = response;
+          expect(article).toMatchObject({
+            votes: 6,
+          });
+        });
+    });
+    it(" PATCH /updates vote property by article_id for minus numbers", () => {
+      return request(app)
+        .patch("/api/articles/4")
+        .send({ inc_votes: -15 })
+        .expect(200)
+        .then((response) => {
+          const {
+            body: { article },
+          } = response;
+          expect(article).toMatchObject({
+            votes: -15,
+          });
+        });
+    });
+
+    it("PATCH / returns 404 msg for valid id but non-existent article", () => {
+      return request(app)
+        .patch("/api/articles/67985986")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("Not found");
+        });
+    });
+    it("PATCH/ returns 400 msg for invalid id", () => {
+      return request(app)
+        .patch("/api/articles/not-an-id")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid request");
+        });
+    });
+    it("PATCH / returns 400 error if votes is empty", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({})
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    it("PATCH / returns 400 error if votes is not the property being sent", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ orange: 7 })
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("Bad request");
