@@ -9,6 +9,7 @@ const {
   postCommentByArticleId,
   updateVotes,
   deleteCommentByCommentId,
+  getUsers,
 } = require("./controllers/news.controllers");
 const {
   handleCustomErrors,
@@ -27,6 +28,7 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 app.patch("/api/articles/:article_id", updateVotes);
 app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
+app.get("/api/users", getUsers);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
