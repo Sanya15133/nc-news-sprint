@@ -76,6 +76,7 @@ describe("GET /api/articles/:article_id", () => {
           created_at: "2020-10-18T01:00:00.000Z",
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 1,
         });
       });
   });
@@ -345,6 +346,113 @@ describe("GET /api/articles", () => {
               expect(user).toHaveProperty("avatar_url");
             });
           });
+      });
+
+      describe("GET /api/articles (topic query)", () => {
+        it("returns articles filtered by topic query", () => {
+          return request(app)
+            .get("/api/articles?topic=mitch")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(200);
+              expect(Array.isArray(articles)).toBe(true);
+              expect(articles).toBeSorted({ descending: true });
+              expect(articles.length).toBe(12);
+              articles.forEach((article) => {
+                expect(article.topic).toBe("mitch");
+                expect(article).toHaveProperty("author");
+                expect(article).toHaveProperty("title");
+                expect(article).toHaveProperty("article_id");
+                expect(article).toHaveProperty("topic");
+                expect(article).toHaveProperty("created_at");
+                expect(article).toHaveProperty("votes");
+                expect(article).toHaveProperty("article_img_url");
+                expect(article).toHaveProperty("comment_count");
+              });
+            });
+        });
+        it("returns empty array for topic query with no associated articles", () => {
+          return request(app)
+            .get("/api/articles?topic=paper")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(200);
+              expect(Array.isArray(articles)).toBe(true);
+              expect(articles).toEqual([]);
+            });
+        });
+        it("returns 404 for invalid topic", () => {
+          return request(app)
+            .get("/api/articles?topic=cake")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(404);
+              expect(response.body.msg).toBe("topic not found");
+            });
+        });
+      });
+      describe("GET /api/articles sort_by category", () => {
+        it("returns articles sorted by sort_by query", () => {
+          return request(app)
+            .get("/api/articles?sort_by=author")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(200);
+              expect(articles).toBeSorted({ descending: true });
+            });
+        });
+        it("returns 404 for invalid sort_by query", () => {
+          return request(app)
+            .get("/api/articles?sort_by=orange")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(404);
+              expect(response.body.msg).toBe("Category not found");
+            });
+        });
+        it("returns 200 for valid order request", () => {
+          return request(app)
+            .get("/api/articles?order=ASC")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(200);
+              expect(articles).toBeSorted("created_at");
+            });
+        });
+        it("returns 400 for invalid order request", () => {
+          return request(app)
+            .get("/api/articles?order=cake")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(400);
+              expect(response.body.msg).toBe("Invalid order request");
+            });
+        });
+        it("sorts by created_at column as default if no category iven and descending if no order given", () => {
+          return request(app)
+            .get("/api/articles")
+            .then((response) => {
+              const {
+                body: { articles },
+              } = response;
+              expect(response.status).toBe(200);
+              expect(articles).toBeSorted({ descending: true });
+            });
+        });
       });
     });
   });

@@ -32,7 +32,6 @@ app.get("/api/users", getUsers);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
-
 app.use(handleServerErrors);
 
 module.exports = app;
