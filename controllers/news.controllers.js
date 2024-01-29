@@ -8,6 +8,10 @@ const {
   findCommentByCommentId,
   selectUsers,
 } = require("../models/news.models");
+const {
+  checkTopicExists,
+  checkCategoryExists,
+} = require("../check-topic-exists");
 const fs = require("fs/promises");
 
 exports.getTopics = (req, res, next) => {
@@ -37,8 +41,18 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  findArticles()
-    .then((articles) => {
+  const { sort_by, topic, order } = req.query;
+  const fetchArticleQuery = findArticles(sort_by, topic, order);
+  let queries = [fetchArticleQuery];
+
+  if (topic) {
+    const topicExistence = checkTopicExists(topic);
+    queries.push(topicExistence);
+  }
+
+  Promise.all(queries)
+    .then((response) => {
+      const articles = response[0];
       res.status(200).send({ articles });
     })
     .catch((err) => {
